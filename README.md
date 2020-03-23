@@ -1,2 +1,3 @@
-# IsBusy
-A simple Webapp to check which of your roommates are busy (Zoom U, Sleep, Etc)
+# IsAnyoneBusy
+
+This is a simple webapp which allows you to check which of your roomates are currently busy.  Useful in the age of Zoom Univeristy.
