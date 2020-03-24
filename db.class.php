@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUnused */
 /*
     Author: Thomas Margosian
     Date created: 3/23/20
@@ -25,14 +25,6 @@ class DB {
         }
     }
 
-    /** @noinspection PhpInconsistentReturnPointsInspection
-     * @noinspection PhpIncludeInspection
-     * @param $inColumns
-     * @param $inTable
-     * @param $inQuery
-     * @param $fetchType
-     * @return array
-     */
     function getAllRowsFromTable($inColumns, $inTable, $inQuery) {
         try {
             // Decide if I am going to use a fetch class or an associative array
@@ -101,17 +93,17 @@ class DB {
         }
     }
 
-    function checkStatus($memberId, $attendeeId) {
+    function checkStatus($memberId) {
         try {
             $statement = $this->dbholder->prepare("SELECT status from status WHERE member = :memberID");
             $statement->execute(array("memberID" => $memberId));
-            $data = $statement->fetchAll();
-            return $data;
+            return $statement->fetchAll();
         } catch (PDOException $exception) {
             echo $exception->getMessage();
             return array();
         }
     }
+
     //////////////////////////////////////// END STATUS FUNCTIONS ////////////////////////////////////////
 
 }
