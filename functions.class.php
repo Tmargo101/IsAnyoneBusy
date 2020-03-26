@@ -66,7 +66,7 @@ END;
 END;
     }
 
-    static function isAnyoneBusy() {
+    static function isAnyoneBusy($size) {
         $db = new DB();
         $data = $db->getAllRowsFromTable("*", "status","");
         $busy = 0;
@@ -80,24 +80,70 @@ END;
                 $sleeping++;
             }
         }
+
+        switch ($size){
+            case 'small':
+                $bigText = 'display-4';
+                $subText = '';
+                break;
+            case 'large':
+                $bigText = 'display-1';
+                $subText = 'display-4';
+                break;
+        }
+
        $alert = "";
        if ($busy == 1) {
-           $alert .= "<div class='alert-danger col' style='height:100%'><h1 class='display-1'>Work in progress</h1><h3 class='display-4'>There is $busy person working.</h3></div>";
+           $alert .= "<div class='alert-danger col' style='height:100%'><h1 class='$bigText'>Work in progress</h1><h3 class='$subText'>There is $busy person working.</h3></div>";
        }
        if ($busy > 1) {
-           $alert .= "<div class='alert-danger col' style='height: 100%'><h1 class='display-1'>Work in progress</h1><h3 class='display-4'>There are $busy people working.</h3></div>";
+           $alert .= "<div class='alert-danger col' style='height: 100%'><h1 class='$bigText'>Work in progress</h1><h3 class='$subText'>There are $busy people working.</h3></div>";
        }
        if ($sleeping == 1) {
-           $alert .= "<div class='alert-warning col' style='height:100%'><h1 class='display-1'>Someone's Sleeping</h1><h3 class='display-4'>There is $sleeping person sleeping.</h3></div>";
+           $alert .= "<div class='alert-warning col' style='height:100%'><h1 class='$bigText'>Someone's Sleeping</h1><h3 class='$subText'>There is $sleeping person sleeping.</h3></div>";
        }
        if ($sleeping > 1) {
-           $alert .= "<div class='alert-warning col' style='height: 100%'><h1 class='display-1'>People are Sleeping</h1><h3 class='display-4'>There are $sleeping people sleeping.</h3></div>";
+           $alert .= "<div class='alert-warning col' style='height: 100%'><h1 class='$bigText'>People are Sleeping</h1><h3 class='$subText'>There are $sleeping people sleeping.</h3></div>";
        }
        if ($sleeping == 0 && $busy == 0) {
            $alert .= "<div class='alert-success col'><h1 class='display-1'>All Clear</h1></div>";
        }
        return $alert;
     }
+
+    static function isAnyoneBusySmall() {
+        $db = new DB();
+        $data = $db->getAllRowsFromTable("*", "status","");
+        $busy = 0;
+        $sleeping = 0;
+
+        foreach ($data as $row) {
+            if ($row['status'] == 1) {
+                $busy++;
+            }
+            if ($row['status'] == 2) {
+                $sleeping++;
+            }
+        }
+        $alert = "";
+        if ($busy == 1) {
+            $alert .= "<div class='alert-danger col' style='height:100%'><h1 class='display-4'>Work in progress</h1><h3 class=''>There is $busy person working.</h3></div>";
+        }
+        if ($busy > 1) {
+            $alert .= "<div class='alert-danger col' style='height: 100%'><h1 class='display-4'>Work in progress</h1><h3 class=''>There are $busy people working.</h3></div>";
+        }
+        if ($sleeping == 1) {
+            $alert .= "<div class='alert-warning col' style='height:100%'><h1 class='display-4'>Someone's Sleeping</h1><h3 class=''>There is $sleeping person sleeping.</h3></div>";
+        }
+        if ($sleeping > 1) {
+            $alert .= "<div class='alert-warning col' style='height: 100%'><h1 class='display-4'>People are Sleeping</h1><h3 class=''>There are $sleeping people sleeping.</h3></div>";
+        }
+        if ($sleeping == 0 && $busy == 0) {
+            $alert .= "<div class='alert-success col'><h1 class='display-1'>All Clear</h1></div>";
+        }
+        return $alert;
+    }
+
 
 
     static function buildTable() {
@@ -107,17 +153,18 @@ END;
         foreach ($data as $row) {
             $member = $row['member'];
             $status = $row['status'];
+            $datetime = date('D g:i A',strtotime($row['datetime']));
 
             $table .= "<tr><td><h2>$member</h2></td>";
             switch ($status) {
                 case 0:
-                    $table .= "<td><form action='{$_SERVER['REQUEST_URI']}' method='post'><input name='id' type='hidden' value='$member'><button style='width:100%' class='btn btn-large btn-success' name='button' value='setToBusy'>Free</button></form></div></td>";
+                    $table .= "<td><form action='{$_SERVER['REQUEST_URI']}' method='post'><input name='id' type='hidden' value='$member'><button style='width:100%' class='btn btn-large btn-success' name='button' value='setToBusy'><b>Free</b><br> (Last changed <i>$datetime</i>)</button></form></div></td>";
                     break;
                 case 1:
-                    $table .= "<td class='danger'><form action='{$_SERVER['REQUEST_URI']}' method='post'><input name='id' type='hidden' value='$member'><button style='width:100%; height:100%' class='btn btn-large btn-danger' name='button' value='setToSleep'>Busy</button></form></div></td>";
+                    $table .= "<td class='danger'><form action='{$_SERVER['REQUEST_URI']}' method='post'><input name='id' type='hidden' value='$member'><button style='width:100%; height:100%' class='btn btn-large btn-danger' name='button' value='setToSleep'><b>Busy</b><br> (Last changed <i>$datetime</i>)</button></form></div></td>";
                     break;
                 case 2:
-                    $table .= "<td class='danger'><form action='{$_SERVER['REQUEST_URI']}' method='post'><input name='id' type='hidden' value='$member'><button style='width:100%; height:100%' class='btn btn-large btn-warning' name='button' value='setToFree'>Sleeping</button></form></div></td>";
+                    $table .= "<td class='danger'><form action='{$_SERVER['REQUEST_URI']}' method='post'><input name='id' type='hidden' value='$member'><button style='width:100%; height:100%' class='btn btn-large btn-warning' name='button' value='setToFree'><b>Sleeping</b><br> (Last changed <i>$datetime</i>)</button></form></div></td>";
                     // TODO: Put third option in (Sleep?, auto clears after 8ish hours?)
                     break;
 

@@ -41,50 +41,11 @@ class DB {
         }
     }
 
-//    /** @noinspection PhpInconsistentReturnPointsInspection */
-//    function getSomeRowsFromTable($inObjectReturnType, $inSortBy, $inQuery, $inColumn, $id, $fetchType) {
-//        try {
-//            // Decide if I am going to use a fetch class or an associative array
-//            switch ($fetchType) {
-//                case "class":
-//
-//                    /** @noinspection PhpIncludeInspection */
-//                    include_once "model/{$inObjectReturnType}.class.php";
-//
-//                    // Build query outside of the PDO Prepare instead of binding the params in the PDO since Table and Column names CANNOT be replaced by parameters in PDO.
-//                    $query = "$inQuery WHERE $inColumn = :id ORDER BY :orderby";
-//                    $statement = $this->dbholder->prepare($query);
-//                    $statement->execute(array("id" => $id, "orderby" => $inSortBy));
-//                    $statement->setFetchMode(PDO::FETCH_CLASS, $inObjectReturnType);
-//                    return $statement->fetchAll();
-//                    break;
-//
-//                case "array":
-//                    // Build query outside of the PDO Prepare instead of binding the params in the PDO since Table and Column names CANNOT be replaced by parameters in PDO.
-//                    $query = "$inQuery where m_e.manager = :id";
-//                    $statement = $this->dbholder->prepare($query);
-//                    var_dump($statement);
-//                    $statement->execute(array("id" => $id));
-//                    $statement->setFetchMode(PDO::FETCH_ASSOC);
-//                    return $statement->fetchAll();
-//                    break;
-//
-//                    break;
-//
-//            }
-//
-//        } catch (PDOException $exception) {
-//            echo $exception->getMessage();
-//            return array();
-//        }
-//    }
-
-
     //////////////////////////////////////// START STATUS FUNCTIONS ////////////////////////////////////////
 
     function setStatus($memberId, $status) {
         try {
-            $statement = $this->dbholder->prepare("UPDATE status SET status = :status WHERE member = :memberID");
+            $statement = $this->dbholder->prepare("UPDATE status SET status = :status, datetime=now() WHERE member = :memberID");
             $statement->execute(array("memberID" => $memberId, "status" => $status));
             return $this->dbholder->lastInsertId();
         } catch (PDOException $exception) {

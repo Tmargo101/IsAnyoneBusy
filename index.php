@@ -26,7 +26,7 @@
 </div>
 <div class="container mb-5">
     <div class="row">
-<?php echo Functions::isAnyoneBusy();?>
+<?php echo Functions::isAnyoneBusy('small');?>
     </div>
 </div>
 
